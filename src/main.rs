@@ -23,15 +23,16 @@ struct ScheduleWhen {
 struct ScheduleEntry {
     title:    String,
     category: Option<String>,
-    day:      Option<String>,
+    colour: Option<Colour>,
 
+    day:      Option<String>,
     time:   Option<String>,
     length: Option<String>,
     when:   Option<Vec<ScheduleWhen>>,
 }
 
 #[derive(Debug, Deserialize)]
-struct CategoryColour {
+struct Colour {
     r: u8,
     g: u8,
     b: u8,
@@ -40,7 +41,7 @@ struct CategoryColour {
 #[derive(Debug, Deserialize)]
 struct CategoryDesc {
     name: String,
-    colour: CategoryColour, 
+    colour: Colour, 
 }
 
 #[derive(Debug, Deserialize)]
@@ -95,6 +96,7 @@ pub struct When {
 pub struct Event {
     title: String,
     category: usize,
+    colour: (u8, u8, u8),
     when: Vec<When>,
 }
 
@@ -204,9 +206,10 @@ fn main()  {
 
         
 
-    let (sched, cat_index): (Schedule, HashMap<String, usize>)= {
+    let sched = {
         let mut cat_index: HashMap<String, usize> = HashMap::new();
 
+        let none = String::from("None");
         let mut categories = file.category.unwrap_or(vec![]).into_iter().enumerate().map(|(id, c)| {
             cat_index.insert(c.name.clone(), id);
             Category { name: c.name, colour: (c.colour.r, c.colour.g, c.colour.b) }
@@ -214,30 +217,42 @@ fn main()  {
 
         let mut events = Vec::new();
 
-        let none = String::from("None");
-        if !cat_index.contains_key(&none) {
-            let id = categories.len();
-            cat_index.insert(none.clone(), id);
-            categories.push(Category { name: none.clone(), colour: (200, 200, 200) });
-        }
+        let (none_id, none_colour) = {
+            match cat_index.get(&none) {
+                Some(id) => {
+                    (*id, categories.get(*id).expect("Inconsistent Category Index").colour)
+                },
+                None => {
+                    let id = categories.len();
+                    cat_index.insert(none.clone(), id);
+                    categories.push(Category { name: none.clone(), colour: (200, 200, 200) });
+                    (id, (200, 200, 200))
+                }
+            }
+        };
 
         for entry in file.schedule.unwrap_or(vec![]).into_iter() {
             let title = entry.title;
-            let category = match entry.category {
+            let (category, cat_colour) = match entry.category {
                 Some(c) => {
                     match cat_index.get(&c) {
                         None => {
                             let id = categories.len();
                             cat_index.insert(c.clone(), id);
                             categories.push(Category { name: c.clone(), colour: (50, 50, 50) });
-                            id
+                            (id, (50, 50, 50))
                         },
                         Some(id) => {
-                            *id
+                            (*id, categories.get(*id).expect("Inconsistent Category Index").colour)
                         },
                     }
                 },
-                None => *cat_index.get(&none).expect("Assertion Failed: No None Category"),
+                None => (none_id, none_colour),
+            };
+
+            let colour = match entry.colour {
+                Some(colour) => (colour.r, colour.g, colour.b),
+                None => cat_colour,
             };
 
             let empty = String::new();
@@ -272,12 +287,13 @@ fn main()  {
             events.push(Event {
                 title,
                 category,
+                colour,
                 when,
             });
         }
 
-        (Schedule { categories, events }, cat_index)
+        Schedule { categories, events }
     };
 
-    print!("{}", html::generate_html(tmpl_path.unwrap_or(String::from("cal.html")), sched, cat_index));
+    print!("{}", html::generate_html(tmpl_path.unwrap_or(String::from("cal.html")), sched));
 }

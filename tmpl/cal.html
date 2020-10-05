@@ -7,10 +7,10 @@ body {
 
 .calendar {
     height: 900px;
-    width: 900px;
+    width: 1200px;
     
     display: grid;
-    grid-template-columns: 100px repeat(5, 1fr);
+    grid-template-columns: 100px repeat(7, 1fr);
     grid-template-rows: 50px repeat(16, 1fr);
     grid-column-gap: 2px;
 
@@ -56,6 +56,14 @@ body {
 
 .fri-lbl {
     grid-column: 6;
+}
+
+.sat-lbl {
+    grid-column: 7;
+}
+
+.sun-lbl {
+    grid-column: 8;
 }
 
 .time-lbl {
@@ -146,6 +154,8 @@ body {
 		<div class="day-lbl wed-lbl">Wednesday</div>
 		<div class="day-lbl thu-lbl">Thursday</div>
 		<div class="day-lbl fri-lbl">Friday</div>
+		<div class="day-lbl sat-lbl">Saturday</div>
+		<div class="day-lbl sun-lbl">Sunday</div>
 
 		<div class="time-lbl hr-six-lbl">06:00</div>
 		<div class="time-lbl hr-seven-lbl">07:00</div>
