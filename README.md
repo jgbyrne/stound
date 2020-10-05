@@ -19,24 +19,24 @@ Specify your timetable in TOML format as per the example below:
     length = "1h30m"
 
         [[schedule.when]]
-	day = "Monday"
+        day = "Monday"
 
-	[[schedule.when]]
-	day = "Thursday"
+        [[schedule.when]]
+        day = "Thursday"
 
     [[schedule]]
     title = "Product Direction Meeting"
     category = "Work"
 
         [[schedule.when]]
-	day = "Tuesday"
-	time = "11:00"
-	length = "1h"
+        day = "Tuesday"
+        time = "11:00"
+        length = "1h"
 
-	[[schedule.when]]
-	day = "Friday"
-	time = "15:00"
-	length = "1h20m"
+        [[schedule.when]]
+        day = "Friday"
+        time = "15:00"
+        length = "1h20m"
 
     [[schedule]]
     title = "Rugby Training"
@@ -53,12 +53,12 @@ Specify your timetable in TOML format as per the example below:
     time = "8:00"
 
         [[schedule.when]]
-	day = "Monday"
-	length = "30m"
+        day = "Monday"
+        length = "30m"
 
         [[schedule.when]]
-	day = "Wednesday"
-	length = "45m"
+        day = "Wednesday"
+        length = "45m"
 
 Then run the command:
 
