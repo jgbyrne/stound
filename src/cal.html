@@ -1,0 +1,171 @@
+<html>
+    <head>
+        <style>
+body {
+    background-color: #FFE;
+}
+
+.calendar {
+    height: 900px;
+    width: 900px;
+    
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    grid-template-rows: 50px repeat(16, 1fr);
+    grid-column-gap: 2px;
+
+    font-family: sans-serif;
+}
+
+.event {
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #FFE;
+    border-bottom: 1px solid #FFE;
+    padding: 3px;
+    font-size: 13px;
+    color: #EEE;
+}
+
+.day-lbl {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-row: 1;
+    font-weight: bold;
+}
+
+.mon-lbl {
+    grid-column: 2;
+}
+
+.tue-lbl {
+    grid-column: 3;
+}
+
+.wed-lbl {
+    grid-column: 4;
+}
+
+.thu-lbl {
+    grid-column: 5;
+}
+
+.fri-lbl {
+    grid-column: 6;
+}
+
+.time-lbl {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column: 1;
+    font-size: 16px;
+    font-family: Georgia, serif;
+
+    position: relative;
+    height: 40px;
+    top: -20px;
+}
+
+.hr-six-lbl {
+    grid-row: 2;
+}
+
+.hr-seven-lbl {
+    grid-row: 3;
+}
+
+.hr-eight-lbl {
+    grid-row: 4;
+}
+
+.hr-nine-lbl {
+    grid-row: 5;
+}
+
+.hr-ten-lbl {
+    grid-row: 6;
+}
+
+.hr-eleven-lbl {
+    grid-row: 7;
+}
+
+.hr-twelve-lbl {
+    grid-row: 8;
+}
+
+.hr-thirteen-lbl {
+    grid-row: 9;
+}
+
+.hr-fourteen-lbl {
+    grid-row: 10;
+}
+
+.hr-fifteen-lbl {
+    grid-row: 11;
+}
+
+.hr-sixteen-lbl {
+    grid-row: 12;
+}
+
+.hr-seventeen-lbl {
+    grid-row: 13;
+}
+
+.hr-eighteen-lbl {
+    grid-row: 14;
+}
+
+.hr-nineteen-lbl {
+    grid-row: 15;
+}
+
+.hr-twenty-lbl {
+    grid-row: 16;
+}
+
+.hr-twentyone-lbl {
+    grid-row: 17;
+}
+
+%%STYLE%%
+
+        </style>
+    </head>
+    <body>
+        <div class="calendar">
+		<div class="day-lbl mon-lbl">Monday</div>
+		<div class="day-lbl tue-lbl">Tuesday</div>
+		<div class="day-lbl wed-lbl">Wednesday</div>
+		<div class="day-lbl thu-lbl">Thursday</div>
+		<div class="day-lbl fri-lbl">Friday</div>
+
+		<div class="time-lbl hr-six-lbl">06:00</div>
+		<div class="time-lbl hr-seven-lbl">07:00</div>
+		<div class="time-lbl hr-eight-lbl">08:00</div>
+		<div class="time-lbl hr-nine-lbl">09:00</div>
+		<div class="time-lbl hr-ten-lbl">10:00</div>
+		<div class="time-lbl hr-eleven-lbl">11:00</div>
+		<div class="time-lbl hr-twelve-lbl">12:00</div>
+		<div class="time-lbl hr-thirteen-lbl">13:00</div>
+		<div class="time-lbl hr-fourteen-lbl">14:00</div>
+		<div class="time-lbl hr-fifteen-lbl">15:00</div>
+		<div class="time-lbl hr-sixteen-lbl">16:00</div>
+		<div class="time-lbl hr-seventeen-lbl">17:00</div>
+		<div class="time-lbl hr-eighteen-lbl">18:00</div>
+		<div class="time-lbl hr-nineteen-lbl">19:00</div>
+		<div class="time-lbl hr-twenty-lbl">20:00</div>
+		<div class="time-lbl hr-twentyone-lbl">21:00</div>
+
+%%HTML%%
+
+        </div>
+    </body>
+</html>
