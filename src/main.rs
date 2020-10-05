@@ -1,14 +1,14 @@
-use std::io::{self, Read};
+use std::io::Read;
 use std::fs;
 use std::process;
 use std::env;
 use std::str::FromStr;
 use std::collections::HashMap;
 
-use serde;
-#[macro_use]
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use toml;
+
+mod html;
 
 // Deserialization Data Structures
 
@@ -85,26 +85,26 @@ impl FromStr for Day {
 }
 
 #[derive(Debug)]
-struct When {
+pub struct When {
     day: Day,
     time: u16,
     length: u16,
 }
 
 #[derive(Debug)]
-struct Event {
+pub struct Event {
     title: String,
     category: usize,
     when: Vec<When>,
 }
 
 #[derive(Debug)]
-struct Schedule {
+pub struct Schedule {
     categories: Vec<Category>,
     events: Vec<Event>,
 }
 
-fn die(msg: &str) -> ! {
+pub fn die(msg: &str) -> ! {
     eprintln!("Fatal Error: {}", msg);
     process::exit(1);
 }
@@ -170,20 +170,20 @@ fn main()  {
 
     let file: ScheduleFile = toml::from_str(&buf).unwrap();
 
-    let (sched, cat_ids): (Schedule, HashMap<String, usize>)= {
-        let mut cat_ids: HashMap<String, usize> = HashMap::new();
+    let (sched, cat_index): (Schedule, HashMap<String, usize>)= {
+        let mut cat_index: HashMap<String, usize> = HashMap::new();
 
         let mut categories = file.category.unwrap_or(vec![]).into_iter().enumerate().map(|(id, c)| {
-            cat_ids.insert(c.name.clone(), id);
+            cat_index.insert(c.name.clone(), id);
             Category { name: c.name, colour: (c.colour.r, c.colour.g, c.colour.b) }
         }).collect::<Vec<Category>>();
 
         let mut events = Vec::new();
 
         let none = String::from("None");
-        if !cat_ids.contains_key(&none) {
+        if !cat_index.contains_key(&none) {
             let id = categories.len();
-            cat_ids.insert(none.clone(), id);
+            cat_index.insert(none.clone(), id);
             categories.push(Category { name: none.clone(), colour: (200, 200, 200) });
         }
 
@@ -191,10 +191,10 @@ fn main()  {
             let title = entry.title;
             let category = match entry.category {
                 Some(c) => {
-                    match cat_ids.get(&c) {
+                    match cat_index.get(&c) {
                         None => {
                             let id = categories.len();
-                            cat_ids.insert(c.clone(), id);
+                            cat_index.insert(c.clone(), id);
                             categories.push(Category { name: c.clone(), colour: (50, 50, 50) });
                             id
                         },
@@ -203,7 +203,7 @@ fn main()  {
                         },
                     }
                 },
-                None => *cat_ids.get(&none).expect("Assertion Failed: No None Category"),
+                None => *cat_index.get(&none).expect("Assertion Failed: No None Category"),
             };
 
             let empty = String::new();
@@ -242,60 +242,10 @@ fn main()  {
             });
         }
 
-        (Schedule { categories, events }, cat_ids)
+        (Schedule { categories, events }, cat_index)
     };
 
-    let tmpl = fs::read_to_string("cal.html")
-                   .unwrap_or_else(|_| die("Could not open calendar template"));
-
-    let mut css = String::new();
-    let mut html = String::new();
-
-    for (cat, id) in cat_ids.iter() {
-        let category = sched.categories.get(*id).expect("Assertion Failed: No such category");
-        css.push_str(&format!(".cat-{} {{\n", id));
-        let (r, g, b) = category.colour;
-        css.push_str(&format!("    background-color: rgb({}, {}, {});\n", r, g, b));
-        css.push_str("}\n\n");
-    }
-
-    let mut event_ctr: u16 = 1;
-    for event in sched.events {
-        for when in event.when {
-            let column = match when.day {
-                Day::Monday => 2,
-                Day::Tuesday => 3,
-                Day::Wednesday => 4,
-                Day::Thursday => 5,
-                Day::Friday => 6,
-                Day::Saturday => die("Web output is weekdays only"),
-                Day::Sunday => die("Web output is weekdays only"),
-            };
-
-            let top: f32 = (when.time as f32 - 360.0) / 60.0;
-            let height: f32 = when.length as f32 * (5.0 / 3.0);
-            let buffer: f32 = top.fract() * 100.0;
-            let top: f32 = top.floor();
-
-            css.push_str(&format!(".event-{} {{\n", event_ctr));
-            css.push_str(&format!("    grid-column: {};\n", column));
-            css.push_str(&format!("    grid-row: {};\n", top + 2.0));
-            css.push_str(&format!("    top: {}%;\n", buffer));
-            css.push_str(&format!("    height: calc({}% - 8px);\n", height));
-            css.push_str("}\n\n");
-
-            html.push_str(&format!("<div class=\"cat-{} event event-{}\">\n", event.category, event_ctr));
-            html.push_str(&format!("    {}\n", event.title));
-            html.push_str("</div>\n");
-
-            event_ctr += 1;
-        }
-    }
-
-    let doc = tmpl.replace("%%STYLE%%", &css);
-    let doc = doc.replace("%%HTML%%", &html);
-
-    println!("{}", doc);
+    print!("{}", html::generate_html("cal.html", sched, cat_index));
 }
 
 
