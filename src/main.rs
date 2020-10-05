@@ -160,6 +160,7 @@ fn parse_length(length: &str) -> u16 {
 fn main()  {
     let mut buf = String::new();
     let mut tmpl_path: Option<String> = None;
+    let mut debug = false;
 
     let mut state = '.';
     for arg in env::args().skip(1) {
@@ -168,6 +169,9 @@ fn main()  {
                 match arg.as_str() {
                     "--template" => {
                         state = 't';
+                    },
+                    "--debug" => {
+                        debug = true;
                     },
                     _ => {
                         let mut f = fs::File::open(&arg).unwrap_or_else(
@@ -187,7 +191,18 @@ fn main()  {
     }
     if state != '.' { die("Dangling argument") }
 
-    let file: ScheduleFile = toml::from_str(&buf).unwrap();
+    let file: ScheduleFile = match toml::from_str(&buf) {
+        Ok(file) => file,
+        Err(err) => {
+            if debug {
+                eprintln!("Internal `serde` error for debugging purposes - line numbers may be wrong!");
+                eprintln!("{:?}", err);
+            }
+            die("TOML Parsing Error");
+        },
+    };
+
+        
 
     let (sched, cat_index): (Schedule, HashMap<String, usize>)= {
         let mut cat_index: HashMap<String, usize> = HashMap::new();
