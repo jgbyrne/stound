@@ -3,7 +3,7 @@ use std::fs;
 
 use crate::{Schedule, Day, die};
 
-pub fn generate_html(tmpl_path: &str, sched: Schedule, cat_index: HashMap<String, usize>) -> String {
+pub fn generate_html(tmpl_path: String, sched: Schedule, cat_index: HashMap<String, usize>) -> String {
     let tmpl = fs::read_to_string(tmpl_path)
                    .unwrap_or_else(|_| die("Could not open calendar template"));
 

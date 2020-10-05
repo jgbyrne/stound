@@ -159,14 +159,33 @@ fn parse_length(length: &str) -> u16 {
 
 fn main()  {
     let mut buf = String::new();
+    let mut tmpl_path: Option<String> = None;
 
-    for file in env::args().skip(1) {
-        let mut f = fs::File::open(&file).unwrap_or_else(
-                                          |_| die(&format!("Could not open file '{}'", &file)));
-        f.read_to_string(&mut buf).unwrap_or_else(
-                                   |_| die(&format!("Could not read from file '{}'", &file)));
-        buf.push('\n');
+    let mut state = '.';
+    for arg in env::args().skip(1) {
+        match state {
+            '.' => {
+                match arg.as_str() {
+                    "--template" => {
+                        state = 't';
+                    },
+                    _ => {
+                        let mut f = fs::File::open(&arg).unwrap_or_else(
+                                                         |_| die(&format!("Could not open file '{}'", &arg)));
+                        f.read_to_string(&mut buf).unwrap_or_else(
+                                                   |_| die(&format!("Could not read from file '{}'", &arg)));
+                        buf.push('\n');
+                    },
+                }
+            },
+            't' => {
+                tmpl_path = Some(String::from(arg));
+                state = '.';
+            }
+            _ => { unreachable!() }
+        }
     }
+    if state != '.' { die("Dangling argument") }
 
     let file: ScheduleFile = toml::from_str(&buf).unwrap();
 
@@ -245,7 +264,5 @@ fn main()  {
         (Schedule { categories, events }, cat_index)
     };
 
-    print!("{}", html::generate_html("cal.html", sched, cat_index));
+    print!("{}", html::generate_html(tmpl_path.unwrap_or(String::from("cal.html")), sched, cat_index));
 }
-
-
